@@ -1,0 +1,27 @@
+{
+  "name": "mongo2es",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agufranov/mongo2es.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agufranov/mongo2es/issues"
+  },
+  "homepage": "https://github.com/agufranov/mongo2es#readme",
+  "dependencies": {
+    "coffee-script": "^1.10.0",
+    "elasticsearch": "^11.0.1",
+    "js-yaml": "^3.6.0",
+    "mongodb": "^2.1.16",
+    "q": "^1.4.1",
+    "synchronize": "^0.9.15"
+  }
+}
