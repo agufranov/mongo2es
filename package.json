@@ -17,11 +17,13 @@
   },
   "homepage": "https://github.com/agufranov/mongo2es#readme",
   "dependencies": {
+    "chalk": "^1.1.3",
     "coffee-script": "^1.10.0",
     "elasticsearch": "^11.0.1",
     "js-yaml": "^3.6.0",
     "mongodb": "^2.1.16",
     "q": "^1.4.1",
+    "ramda": "^0.21.0",
     "synchronize": "^0.9.15"
   }
 }
