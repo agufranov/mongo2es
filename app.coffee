@@ -7,28 +7,45 @@ sync = require 'synchronize'
 chalk = require 'chalk'
 MongoPaginator = require './MongoPaginator'
 ChunkMigrator = require './ChunkMigrator'
+ElasticBulkWriter = require './ElasticBulkWriter'
 
 settings = jsYaml.safeLoad fs.readFileSync 'settings.yml'
 { esConnect, mongoConnect } = require('./connect') settings
 
-sync.fiber ->
-  Q.all [ esConnect(), mongoConnect() ]
-    .then ([ esClient, mongoClient ]) ->
-      sync esClient.indices, 'create', 'delete'
+Q.all [ esConnect(), mongoConnect() ]
+  .then ([ esClient, mongoClient ]) ->
+    sync.fiber ->
       console.log chalk.green 'Connected'
-      mp = new MongoPaginator mongoClient, 'test_es_migration', 2
+      mp = new MongoPaginator mongoClient, 'debug_topic_labels', 2000
 
+      bw = new ElasticBulkWriter esClient, 'pi_registry_topic_labels', 'all'
+      bw.recreateIndex()
+      bw.putMapping
+        properties:
+          suggest:
+            type: 'completion'
+            analyzer: 'simple'
+            search_analyzer: 'simple'
+            payloads: true
+      # return
       bulkWrite = (result) ->
-        console.log result
-        Q.delay 500
-          .then ->
-            console.log "Bulk write #{result.length} items"
+        bw.bulkWrite result
+        # console.log result
+        # Q.delay 500
+        #   .then ->
+        #     console.log "Bulk write #{result.length} items"
 
       mgr = new ChunkMigrator
         getNextChunkFn: mp.getNextPage
         insertFn: bulkWrite
         isExhaustedFn: mp.getExhausted
-        # transformFn: R.prop '_id'
+        transformFn: (doc) =>
+          R.merge doc,
+            suggest:
+              input: [doc.readable_label]
+              output: doc.readable_label
+              payload: doc
+              weight: doc.counts.people_count
 
       mgr.on 'progress', -> console.log 'mgr progress', arguments
       mgr.on 'error', ->

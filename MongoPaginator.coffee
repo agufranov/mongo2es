@@ -25,7 +25,6 @@ class MongoPaginator
         .toArray (err, result) =>
           return reject err if err?
           @_lastId = R.last(result)?._id
-          console.log "lastId: #{@_lastId}"
           @_exhausted = true unless @_lastId?
           resolve result
 
