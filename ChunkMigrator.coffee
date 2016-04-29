@@ -1,3 +1,4 @@
+sync = require 'synchronize'
 { EventEmitter } = require 'events'
 R = require 'ramda'
 Q = require 'q'
@@ -31,7 +32,7 @@ class ChunkMigrator extends EventEmitter
         if @isExhaustedFn()
           @emit 'done'
         else
-          setTimeout => @_nextStep nextChunk
+          setTimeout sync.fiber => @_nextStep nextChunk
 
       .catch (err) =>
         @emit 'error', err

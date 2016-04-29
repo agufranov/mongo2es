@@ -2,3 +2,4 @@
 /settings.yml
 /jobs/*
 !/jobs/bulk_job_base.coffee
+/rsync.sh

@@ -1,5 +1,6 @@
 sync = require 'synchronize'
 R = require 'ramda'
+Q = require 'q'
 
 class ElasticBulkWriter
   constructor: ({
@@ -7,7 +8,7 @@ class ElasticBulkWriter
     index: @_index
     type: @_type
   }) ->
-    sync @_client, 'bulk'
+    sync @_client, 'bulk', 'count'
     sync @_client.indices, 'exists', 'create', 'delete', 'putMapping'
 
   recreateIndex: =>
@@ -21,8 +22,31 @@ class ElasticBulkWriter
       R.omit '_id', doc
     ])(chunk)
 
+  _getCount: =>
+    @_client.count(index: @_index, type: @_type).count
+
   bulkWrite: (chunk) =>
-    @_client.bulk body: @_toBulk chunk
+    Q.Promise (resolve, reject) =>
+      countBefore = @_getCount()
+      chunkCount = chunk.length
+      neededCount = countBefore + chunkCount
+      @_client.bulk { body: @_toBulk chunk }
+      i = 0
+      interval = setInterval =>
+        sync.fiber =>
+          currentCount = @_getCount()
+          if currentCount is neededCount
+            clearInterval interval
+            resolve()
+          else
+            if i > 10
+              console.log "Max retires exceeded, exiting"
+              clearInterval interval
+              reject "Max retires exceeded, exiting"
+            i++
+            console.log "count: #{currentCount}, needed: #{neededCount}, retries: #{i}"
+      , 2000
+
 
   putMapping: (mapping) =>
     @_client.indices.putMapping

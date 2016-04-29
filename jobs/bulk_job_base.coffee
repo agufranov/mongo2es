@@ -10,15 +10,18 @@ class BulkJobBase
     collectionName
     pageSize
     query
+    postQuery
     esIndex
     esType
     mapping
+    transformFn
   }) ->
     mongoPaginator = new MongoPaginator {
       db: mongoClient
       collectionName
       pageSize
       query
+      postQuery
     }
 
     bulkWriter = new ElasticBulkWriter
@@ -34,12 +37,6 @@ class BulkJobBase
       getNextChunkFn: mongoPaginator.getNextPage
       insertFn: bulkWriter.bulkWrite
       isExhaustedFn: mongoPaginator.getExhausted
-      transformFn: (doc) =>
-        R.merge doc,
-          suggest:
-            input: doc.full_name.split ' '
-            output: doc.full_name
-            payload: doc
 
     @mgr.on 'progress', -> console.log 'mgr progress', arguments
     @mgr.on 'error', ->

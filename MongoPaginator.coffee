@@ -7,6 +7,7 @@ class MongoPaginator
     collectionName
     pageSize: @_pageSize
     query: @_query
+    postQuery: @_postQuery
   }) ->
     @_collection = @_db.collection collectionName
 
@@ -22,6 +23,7 @@ class MongoPaginator
       @_query
       { $sort: { _id: 1 } }
       { $limit: @_pageSize }
+      @_postQuery
     ]
 
   getNextPage: =>
