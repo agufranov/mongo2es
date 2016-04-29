@@ -2,7 +2,12 @@ Q = require 'q'
 R = require 'ramda'
 
 class MongoPaginator
-  constructor: (@_db, collectionName, @_pageSize, @_query) ->
+  constructor: ({
+    db: @_db
+    collectionName
+    pageSize: @_pageSize
+    query: @_query
+  }) ->
     @_collection = @_db.collection collectionName
 
   _lastId: null

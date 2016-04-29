@@ -2,14 +2,17 @@ sync = require 'synchronize'
 R = require 'ramda'
 
 class ElasticBulkWriter
-  constructor: (@_client, @_index, @_type) ->
+  constructor: ({
+    elasticsearchClient: @_client
+    index: @_index
+    type: @_type
+  }) ->
     sync @_client, 'bulk'
-    sync @_client.indices, 'create', 'delete', 'putMapping'
+    sync @_client.indices, 'exists', 'create', 'delete', 'putMapping'
 
   recreateIndex: =>
-    console.log 1
-    @_client.indices.delete index: @_index
-    console.log 2
+    if @_client.indices.exists(index: @_index)
+      @_client.indices.delete index: @_index
     @_client.indices.create index: @_index
 
   _toBulk: (chunk) =>
