@@ -31,7 +31,7 @@ class ChunkMigrator extends EventEmitter
         if @isExhaustedFn()
           @emit 'done'
         else
-          @_nextStep nextChunk
+          setTimeout => @_nextStep nextChunk
 
       .catch (err) =>
         @emit 'error', err
