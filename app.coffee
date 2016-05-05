@@ -10,7 +10,7 @@ settings = jsYaml.safeLoad fs.readFileSync 'settings.yml'
 { esConnect, mongoConnect } = require('./connect') settings
 
 jobs = [
-  'profiles'
+  'topics'
 ]
 
 Q.all [ esConnect(), mongoConnect() ]

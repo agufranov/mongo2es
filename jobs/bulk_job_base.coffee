@@ -37,6 +37,7 @@ class BulkJobBase
       getNextChunkFn: mongoPaginator.getNextPage
       insertFn: bulkWriter.bulkWrite
       isExhaustedFn: mongoPaginator.getExhausted
+      transformFn: transformFn
 
     @mgr.on 'progress', -> console.log 'mgr progress', arguments
     @mgr.on 'error', ->
