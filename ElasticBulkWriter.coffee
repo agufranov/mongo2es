@@ -9,7 +9,7 @@ class ElasticBulkWriter
     type: @_type
   }) ->
     sync @_client, 'bulk', 'count'
-    sync @_client.indices, 'exists', 'create', 'delete', 'putMapping'
+    sync @_client.indices, 'exists', 'create', 'delete', 'putMapping', 'putSettings', 'close', 'open'
 
   recreateIndex: =>
     if @_client.indices.exists(index: @_index)
@@ -54,5 +54,12 @@ class ElasticBulkWriter
       type: @_type
       body:
         "#{@_type}": mapping
+
+  putSettings: (settings) =>
+    @_client.indices.close index: @_index
+    @_client.indices.putSettings
+      index: @_index
+      body: settings
+    @_client.indices.open index: @_index
 
 module.exports = ElasticBulkWriter

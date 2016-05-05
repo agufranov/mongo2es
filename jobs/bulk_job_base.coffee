@@ -14,6 +14,7 @@ class BulkJobBase
     esIndex
     esType
     mapping
+    indexSettings
     transformFn
   }) ->
     mongoPaginator = new MongoPaginator {
@@ -31,7 +32,8 @@ class BulkJobBase
 
     bulkWriter.recreateIndex()
     console.log "Recreated index #{esIndex}"
-    bulkWriter.putMapping mapping
+    bulkWriter.putSettings indexSettings if indexSettings?
+    bulkWriter.putMapping mapping if mapping?
 
     @mgr = new ChunkMigrator
       getNextChunkFn: mongoPaginator.getNextPage
